@@ -64,20 +64,22 @@ library SafeMath {
 }
 
 
-
-contract evidenceContract is Ownable{
-    
-
-    struct record {
+ struct  record  public {
 
       uint256 number;  // number of users
-      string url; // url , sent by the user
-      string _hash; // we get from the server/archivum, its also the nam of the object in the storage
+      byte32 url; // url , sent by the user
+      byte32 _hash; // we get from the server/archivum, its also the nam of the object in the storage
       uint256 timestamp; // when we get the datas
       uint256 timelimit; // when we want to hold the datas in the storage
 
 
     }
+
+
+contract evidenceContract is Ownable{
+    
+
+   
 
     uint256  public rate;   // how much time we give for 1 wei or ether
     uint public number = 0;
@@ -92,8 +94,10 @@ contract evidenceContract is Ownable{
         return now;
     }
     
-    function newUser(address user_address, uint user_value,  string url, string _hash) onlyOwner  {
-     
+    function newUser(address user_address, uint user_value, bytes url, bytes _hash) onlyOwner  {
+     address _address = user_address;
+     uint _value = user_value;
+
      uint256 timestamp = now;
      uint256 timelimit;
 
@@ -101,7 +105,7 @@ contract evidenceContract is Ownable{
      number++;
      
 
-     theList[msg.sender] = record(number,_hash,url,timestamp,timelimit);
+     theList[_address] = record(number,_hash,url,timestamp,timelimit);
 
        
     }
