@@ -111,10 +111,18 @@ contract evidenceContract is Ownable{
     }
 
 
-    
+    function evidenceContract(bytes url, bytes _hash)  { 
+             
+    }
 
-
-
+     // fallback function can be used to buy tokens
+    function () public payable {
+    buyTimetoStorage(msg.sender, msg.value);
+    }
+ 
+    function buyTimetoStorage( address _address, uint _value){ 
+             
+    }
    
 
 
