@@ -42,7 +42,7 @@ contract Ownable {
 
 contract evidenceContract is Ownable{     
 
-    uint256  public rate;   // how much time we give for 1 wei or ether     
+    uint256  public rate = 1;  // how much time we give for 1 wei or ether     
     address public myAddress = this;
 
     event Newuser(uint id, address indexed who, uint256 indexed timelimit);
@@ -62,6 +62,9 @@ contract evidenceContract is Ownable{
   mapping(uint => Member) members;
 
   function addMember(uint id, address user_address, bytes32 md5sum, bytes32 _hash, uint timelimit) onlyOwner public returns(bool success) {
+   
+    require (user_address != 0x0 || user_address != myAddress);
+    require (timelimit > now);
     members[id].userrecord.user_address = user_address;
     members[id].userrecord.md5sum = md5sum;
     members[id].userrecord._hash = _hash;
