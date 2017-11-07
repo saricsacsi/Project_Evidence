@@ -14,10 +14,10 @@ maybe more datas:
 	- discount
 	- etc...
 
-I want to get back the datas from user ID.
+I want to get back the datas from user ID. Update: I use the address to index of the record
 
 Plan: 
-- just the members can send ether to the contarct
+- just the members can send ether to the contarct --> made onlyMember modifier
 - from the amount of ether i want to calculate the timelimit
 - I want to know an address is a member or not?
 - I want to host from the member a signal "OK" 
