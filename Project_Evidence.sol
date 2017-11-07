@@ -44,11 +44,14 @@ contract evidenceContract is Ownable{
 
     uint256  public rate = 1;  // how much time we give for 1 wei or ether     
     address public myAddress = this;
+    mapping (address => bool) public isMember;
 
-    event Newuser(uint id, address indexed who, uint256 indexed timelimit);
+    event Newuser(address indexed who, uint256 indexed timelimit);
+
+    
 
   struct UserRecord {
-      address user_address;
+     
       bytes32 md5sum; // hash md5sum to check the url sent by the user
       bytes32 _hash; // we get from the server/archivum, its also the name of the object in the storage
       //uint256 timestamp; // when we get the datas
@@ -59,32 +62,42 @@ contract evidenceContract is Ownable{
     UserRecord userrecord;
   }
 
-  mapping(uint => Member) members;
+  mapping(address => Member) members;
+ 
 
-  function addMember(uint id, address user_address, bytes32 md5sum, bytes32 _hash, uint timelimit) onlyOwner public returns(bool success) {
+  function addMember(address user_address, bytes32 md5sum, bytes32 _hash, uint timelimit) onlyOwner public returns(bool success) {
    
     require (user_address != 0x0 || user_address != myAddress);
     require (timelimit > now);
-    members[id].userrecord.user_address = user_address;
-    members[id].userrecord.md5sum = md5sum;
-    members[id].userrecord._hash = _hash;
-    members[id].userrecord.timelimit = timelimit;
+    
+    members[user_address].userrecord.md5sum = md5sum;
+    members[user_address].userrecord._hash = _hash;
+    members[user_address].userrecord.timelimit = timelimit;
+    isMember[user_address] = true;
 
-    Newuser(id, user_address,timelimit);
+    Newuser(user_address,timelimit);
 
     
     return true;
   }
 
-  function getMember(uint id) public constant returns(address user_address, bytes32 md5sum, bytes32 _hash, uint timelimit) {
-    return(members[id].userrecord.user_address,
-    members[id].userrecord.md5sum,
-    members[id].userrecord._hash,
-    members[id].userrecord.timelimit );
+  function getMember(address user_address) public constant returns(bytes32 md5sum, bytes32 _hash, uint timelimit) {
+    return(
+    members[user_address].userrecord.md5sum,
+    members[user_address].userrecord._hash,
+    members[user_address].userrecord.timelimit );
   }   
 
 
   function evidenceContract() public {             
-    }      
+    }    
+
+//  
+
+ modifier onlyMember() {
+    require (isMember[msg.sender]);
+       _;
+  }
+ 
 
 }
