@@ -37,109 +37,51 @@ contract Ownable {
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
  */
-library SafeMath {
-  function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-    uint256 c = a * b;
-    assert(a == 0 || c / a == b);
-    return c;
-  }
-
-  function div(uint256 a, uint256 b) internal pure returns (uint256) {
-    // assert(b > 0); // Solidity automatically throws when dividing by 0
-    uint256 c = a / b;
-    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-    return c;
-  }
-
-  function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-    assert(b <= a);
-    return a - b;
-  }
-
-  function add(uint256 a, uint256 b) internal pure returns (uint256) {
-    uint256 c = a + b;
-    assert(c >= a);
-    return c;
-  }
-}
 
 
- struct  record  public {
 
-      uint256 number;  // number of users
-      byte32 url; // url , sent by the user
-      byte32 _hash; // we get from the server/archivum, its also the nam of the object in the storage
-      uint256 timestamp; // when we get the datas
-      uint256 timelimit; // when we want to hold the datas in the storage
+contract evidenceContract is Ownable{     
 
-
-    }
-
-
-contract evidenceContract is Ownable{
-    
-
-   
-
-    uint256  public rate;   // how much time we give for 1 wei or ether
-    uint public number = 0;
-
-    
-
+    uint256  public rate;   // how much time we give for 1 wei or ether     
     address public myAddress = this;
 
-    mapping (address => record) public theList;
+    event Newuser(uint id, address indexed who, uint256 indexed timelimit);
 
-    function getCurrentTimestamp() internal returns (uint256) {
-        return now;
-    }
-    
-    function newUser(address user_address, uint user_value, bytes url, bytes _hash) onlyOwner  {
-     address _address = user_address;
-     uint _value = user_value;
+  struct UserRecord {
+      address user_address;
+      bytes32 md5sum; // hash md5sum to check the url sent by the user
+      bytes32 _hash; // we get from the server/archivum, its also the name of the object in the storage
+      //uint256 timestamp; // when we get the datas
+      uint256 timelimit; // when we want to hold the datas in the storage
+  }
 
-     uint256 timestamp = now;
-     uint256 timelimit;
+  struct Member {
+    UserRecord userrecord;
+  }
 
-     timelimit = user_value * rate;
-     number++;
-     
+  mapping(uint => Member) members;
 
-     theList[_address] = record(number,_hash,url,timestamp,timelimit);
+  function addMember(uint id, address user_address, bytes32 md5sum, bytes32 _hash, uint timelimit) onlyOwner public returns(bool success) {
+    members[id].userrecord.user_address = user_address;
+    members[id].userrecord.md5sum = md5sum;
+    members[id].userrecord._hash = _hash;
+    members[id].userrecord.timelimit = timelimit;
 
-       
-    }
-
-
-    function evidenceContract(bytes url, bytes _hash)  { 
-             
-    }
-
-     // fallback function can be used to buy tokens
-    function () public payable {
-    buyTimetoStorage(msg.sender, msg.value);
-    }
- 
-    function buyTimetoStorage( address _address, uint _value){ 
-             
-    }
-   
-
-
-
+    Newuser(id, user_address,timelimit);
 
     
+    return true;
+  }
+
+  function getMember(uint id) public constant returns(address user_address, bytes32 md5sum, bytes32 _hash, uint timelimit) {
+    return(members[id].userrecord.user_address,
+    members[id].userrecord.md5sum,
+    members[id].userrecord._hash,
+    members[id].userrecord.timelimit );
+  }   
 
 
- 
-
-
-
-
-    
-
-
-
-
+  function evidenceContract() public {             
+    }      
 
 }
