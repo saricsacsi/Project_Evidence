@@ -1,40 +1,27 @@
 # Project_Evidence
 
 
-The basic status:  
- I want to hold the members and the datas in a record.
- Datas:
-	- address - index
+The contract can register the members with address and 2 different byte32 datas ( in the future e.x. hash or other)
 
-	- hash1
-	- hash2
-	- timelimit
+The owner can register the new member ( AddMember) 
+Anyone can get back the datas of member with the address
+Anyone can check an Address is in or not
+Who is a member can send ether to the contarct and from the amount we calculate the time ( to hold the datas in register)
+The default time limit is now
+The rate is now 1 ether = 1 month
 
-maybe more datas: 
-	- status
-	- discount
-	- etc...
+Plan is the future:
 
-I want to get back the datas from user ID. Update: I use the address to index of the record
-
-
-Plan: 
-- just the members can send ether to the contarct --> made onlyMember modifier
-
-- from the amount of ether i want to calculate the timelimit --> ok ( the counting is wrong)
-
-- I want to know an address is a member or not? --> isMember:true/false done
 
 - I want to host from the member a signal "OK" 
 
-- delete a record -- > if we have status we dont need to delete
+- delete a record or use " status "
 
-- know how much memebrs we have --> I know how much record we have
+- hold multiple record in connection with one address
 
-- maybe later change the timelimit --> updateTimelimit done
+- hold other datas in this record what we need
 
-- one address -more record , more hosted URL  --> back to one , 
-now the multiple record doeasnt work, so its need to do again
+
 
 
 

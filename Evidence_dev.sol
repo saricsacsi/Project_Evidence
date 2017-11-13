@@ -65,22 +65,22 @@ library SafeMath {
 
 
 contract evidenceContract is Ownable{  
-    using SafeMath for uint256;
-   
+    using SafeMath for uint256;   
 
-    uint256  public rate = 1;  // how much time we give for 1 wei or ether     
+    uint256  public rate = 2629743;  // how much time we give for 1 ether , 2629743 = 1 month  
     address public myAddress = this;
+
+    // to know an address is a member or not
     mapping (address => bool) public isMember;
-    address[] private userIndex;
-    uint256 public numberOfRecord = 0;
-    address public multiSig = 0xCD1d44dBdBFdc24C6E25E53282727557a7142f1D; // test multisig1  
-    
   
-
+    // count the records  
+    uint256 public numberOfRecord = 0;
+    // collect the ether to a multisig
+    address public multiSig = 0xCD1d44dBdBFdc24C6E25E53282727557a7142f1D; // test multisig1      
+  
+    // log if we have a new user/member or if we change the timelimit -- only if the user sent ether to the contract
     event Newuser(uint256 number, address indexed who, uint256 indexed timelimit);
-    event LogUpdateTimelimit(address indexed who, uint256 indexed timelimit);
-
-    
+    event LogUpdateTimelimit(address indexed who, uint256 indexed timelimit);    
 
   struct UserRecord {
       
@@ -93,15 +93,13 @@ contract evidenceContract is Ownable{
     UserRecord userrecord;
      }
 
-  mapping(address => Member) members;
-  
+  mapping(address => Member) members;  
  
-
-  function addMember(address user_address, bytes32 md5sum, bytes32 _hash, uint timelimit) onlyOwner public returns(bool success) {
-   
+ // new user to the list with datas without timelimit. Timelimit default is now.
+  function addMember(address user_address, bytes32 md5sum, bytes32 _hash) onlyOwner public returns(bool success) {
+    uint256 timelimit = now;
     require (user_address != 0x0 || user_address != myAddress);
-    require (timelimit > now);
-    
+        
     members[user_address].userrecord.md5sum = md5sum;
     members[user_address].userrecord._hash = _hash;
     members[user_address].userrecord.timelimit = timelimit;
@@ -111,51 +109,46 @@ contract evidenceContract is Ownable{
     return true;
   }
 
+ // can get back the datas of the user if we know the address
   function getMember(address user_address) public constant returns(bytes32 md5sum, bytes32 _hash, uint timelimit) {
     return(
     members[user_address].userrecord.md5sum,
     members[user_address].userrecord._hash,
     members[user_address].userrecord.timelimit );
-  }   
- function updateTimelimit(address user_address, uint timelimit) 
+  }  
+ // update the timelimit what is depends on the amount of ether
+
+  function updateTimelimit(address user_address, uint timelimit) 
     public
     returns(bool success) 
   {
-    require(isMember[user_address]); 
-    members[user_address].userrecord.timelimit = timelimit;
-    LogUpdateTimelimit(user_address,timelimit);
+    require(isMember[user_address]); // check it is a member?
+    members[user_address].userrecord.timelimit = timelimit; // set the timelimit
+    LogUpdateTimelimit(user_address,timelimit); // log the timelimit changeing
     return true;
   }
-
-  function getUserCount() 
-    public
-    constant
-    returns(uint count)
-  {
-    return userIndex.length;
-  }
  
+  function evidenceContract() public {               
+  }    
 
-  function evidenceContract() public {  
-                  
-    }    
-
- function buy(address user_address, uint256 amount) onlyMember internal {
-   
-       // Calculate 
-    uint256 timeUnit = amount.mul(rate);  
+  // buy function calculate the time from the amount , the rate default is 1 ether = 1 month
+  function buy(address user_address, uint256 amount) onlyMember internal { 
+      
+    uint256 timeUnit = amount*rate/ 1 ether;
     uint256 newtimelimit = now.add(timeUnit);
-    updateTimelimit(user_address,newtimelimit);
-       
+
+    updateTimelimit(user_address,newtimelimit);       
     multiSig.transfer(this.balance); // better in case any other ether ends up here
     }
   
+  // payable funcion what is called when we get ether 
   function () public payable {
     buy(msg.sender, msg.value);
- }
+  }
  
-
- modifier onlyMember() {
+  // some more feature in the future what is only the members can do it,
+  // or maybe we change and only the record-owner can do it
+  modifier onlyMember() {
     require (isMember[msg.sender]);
        _;
   }
